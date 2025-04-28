@@ -23,3 +23,4 @@ ThyroidCancerData <- read.csv("data/thyroid_dataset.csv", colClasses = c(
 str(ThyroidCancerData)
 head(ThyroidCancerData)
 View(ThyroidCancerData)
+
