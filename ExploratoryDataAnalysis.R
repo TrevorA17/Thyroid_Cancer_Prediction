@@ -59,5 +59,42 @@ var(ThyroidCancerData$Age)         # Variance
 range(ThyroidCancerData$Age)        # Range (min and max)
 summary(ThyroidCancerData$Age)      # Min, 1st Qu., Median, Mean, 3rd Qu., Max
 
+# Cross-tabulations (example relationships)
+table(ThyroidCancerData$Gender, ThyroidCancerData$Stage)
+table(ThyroidCancerData$Smoking, ThyroidCancerData$Stage)
+table(ThyroidCancerData$Focality, ThyroidCancerData$Stage)
+table(ThyroidCancerData$Risk, ThyroidCancerData$Recurred)
 
+# Chi-Square Test between Smoking and Stage
+chisq.test(table(ThyroidCancerData$Smoking, ThyroidCancerData$Stage))
+
+chisq.test(table(ThyroidCancerData$Gender, ThyroidCancerData$Recurred))
+
+# ANOVA test for Age across different Stages
+anova_result <- aov(Age ~ Stage, data = ThyroidCancerData)
+summary(anova_result)
+
+# Load libraries
+library(ggplot2)
+
+# Histogram of Age
+ggplot(ThyroidCancerData, aes(x = Age)) +
+  geom_histogram(binwidth = 5, fill = "skyblue", color = "black") +
+  labs(title = "Distribution of Age", x = "Age", y = "Count")
+
+# Bar plot for Gender
+ggplot(ThyroidCancerData, aes(x = Gender)) +
+  geom_bar(fill = "lightgreen") +
+  labs(title = "Gender Distribution", x = "Gender", y = "Count")
+
+# Bar plot for Stage
+ggplot(ThyroidCancerData, aes(x = Stage)) +
+  geom_bar(fill = "salmon") +
+  labs(title = "Cancer Stage Distribution", x = "Stage", y = "Count")
+
+# Boxplot of Age across Stage
+ggplot(ThyroidCancerData, aes(x = Stage, y = Age, fill = Stage)) +
+  geom_boxplot() +
+  labs(title = "Age Distribution across Cancer Stages", x = "Stage", y = "Age") +
+  theme(legend.position = "none")
 
