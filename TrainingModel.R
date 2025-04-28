@@ -126,3 +126,40 @@ dotplot(model_comparison, metric = "Accuracy") # Dotplot of Accuracy
 # You can also check Kappa scores if needed
 bwplot(model_comparison, metric = "Kappa")
 dotplot(model_comparison, metric = "Kappa")
+
+# Save the best model (XGBoost in this case)
+saveRDS(xgb_model, "./models/best_xgb_model.rds")
+
+# Load the saved XGBoost model when needed
+loaded_xgb_model <- readRDS("./models/best_xgb_model.rds")
+
+# Example of prediction with the loaded model:
+# Let's say we want to predict a new observation
+new_data <- data.frame(
+  # You need to specify your new observation's values here,
+  # like Age, Gender, Smoking, Thyroid Function, etc.
+  Age = 45,
+  Gender = "M",  # or factor(1) for Male, or factor("M") depending on how you encoded
+  Smoking = "No",
+  Hx_Smoking = "No",
+  Hx_Radiotherapy = "No",
+  Thyroid_Function = "Euthyroid",
+  Physical_Examination = "Single nodular goiter-left",
+  Adenopathy = "No",
+  Pathology = "Micropapillary",
+  Focality = "Uni-Focal",
+  Risk = "Low",
+  T = "T1a",
+  N = "N0",
+  M = "M0",
+  Stage = "I",  # Replace with actual stage if testing
+  Response = "Excellent",
+  Recurred = "No"
+)
+
+# Predict using the loaded model
+prediction <- predict(loaded_xgb_model, newdata = new_data)
+
+# Print prediction result
+print(prediction)
+
