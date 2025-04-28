@@ -1,0 +1,204 @@
+---
+title: "Thyroid Cancer Prediction"
+author: "Trevor Okinda"
+date: "2024"
+output:
+  github_document: 
+    toc: yes
+    toc_depth: 4
+    fig_width: 6
+    fig_height: 4
+    df_print: default
+editor_options:
+  chunk_output_type: console
+---
+
+# Student Details
+
+|                                              |     |
+|----------------------------------------------|-----|
+| **Student ID Number**                        | 134780 |
+| **Student Name**                             | Trevor Okinda |
+| **BBIT 4.2 Group**                           | C |
+| **Project Name**                             | Thyroid Cancer Prediction |
+
+# Setup Chunk
+
+**Note:** the following KnitR options have been set as the global defaults: <BR> `knitr::opts_chunk$set(echo = TRUE, warning = FALSE, eval = TRUE, collapse = FALSE, tidy = TRUE)`.
+
+More KnitR options are documented here <https://bookdown.org/yihui/rmarkdown-cookbook/chunk-options.html> and here <https://yihui.org/knitr/options/>.
+
+```{r setup, include=FALSE}
+library(formatR)
+knitr::opts_chunk$set(
+  warning = FALSE,
+  collapse = FALSE
+)
+```
+
+### Source: 
+
+The dataset that was used can be downloaded here: *\<https://www.kaggle.com/datasets/zaraavagyan/weathercsv/discussion\>*
+
+### Reference:
+
+*\<Avagyan, Z. (2017). Weather CSV [Data set]. Kaggle. https://www.kaggle.com/datasets/zaraavagyan/weathercsv\>\
+Refer to the APA 7th edition manual for rules on how to cite datasets: <https://apastyle.apa.org/style-grammar-guidelines/references/examples/data-set-references>*
+
+# Understanding the Dataset (Exploratory Data Analysis (EDA))
+
+## Loading the Dataset
+```{r load dataset}
+# Load dataset using read.csv
+ThyroidCancerData <- read.csv("thyroid_dataset.csv", colClasses = c(
+  Age = "numeric",
+  Gender = "factor",
+  Smoking = "factor",
+  Hx_Smoking = "factor",
+  Hx_Radiothreapy = "factor",
+  Thyroid_Function = "factor",
+  Physical_Examination = "factor",
+  Adenopathy = "factor",
+  Pathology = "factor",
+  Focality = "factor",
+  Risk = "factor",
+  T = "factor",
+  N = "factor",
+  M = "factor",
+  Stage = "factor",
+  Response = "factor",
+  Recurred = "factor"
+))
+
+# Preview the structure and a few rows
+str(ThyroidCancerData)
+head(ThyroidCancerData)
+View(ThyroidCancerData)
+
+```
+
+## Measures of Frequency
+```{r MOF}
+# Measures of Frequency
+# Frequency tables for categorical variables
+table(ThyroidCancerData$Gender)
+table(ThyroidCancerData$Smoking)
+table(ThyroidCancerData$Hx_Smoking)
+table(ThyroidCancerData$Hx_Radiothreapy)
+table(ThyroidCancerData$Thyroid_Function)
+table(ThyroidCancerData$Physical_Examination)
+table(ThyroidCancerData$Adenopathy)
+table(ThyroidCancerData$Pathology)
+table(ThyroidCancerData$Focality)
+table(ThyroidCancerData$Risk)
+table(ThyroidCancerData$Stage)
+table(ThyroidCancerData$Response)
+table(ThyroidCancerData$Recurred)
+```
+
+## Measures of Central Tendency
+```{r MOCT}
+# Measures of Central Tendency
+# Mean, Median, Mode (custom function) for Age
+mean(ThyroidCancerData$Age)
+median(ThyroidCancerData$Age)
+
+# Mode function
+get_mode <- function(v) {
+  uniqv <- unique(v)
+  uniqv[which.max(tabulate(match(v, uniqv)))]
+}
+get_mode(ThyroidCancerData$Age)
+```
+
+## Measures of Distribution
+```{r MOD}
+# Measures of Central Tendency
+# Standard Deviation, Variance, Range, and Summary for Age
+sd(ThyroidCancerData$Age)          # Standard deviation
+var(ThyroidCancerData$Age)         # Variance
+range(ThyroidCancerData$Age)        # Range (min and max)
+summary(ThyroidCancerData$Age)      # Min, 1st Qu., Median, Mean, 3rd Qu., Max
+
+# Cross-tabulations (example relationships)
+table(ThyroidCancerData$Gender, ThyroidCancerData$Stage)
+table(ThyroidCancerData$Smoking, ThyroidCancerData$Stage)
+table(ThyroidCancerData$Focality, ThyroidCancerData$Stage)
+table(ThyroidCancerData$Risk, ThyroidCancerData$Recurred)
+```
+
+## ANOVA
+```{r ANOVA}
+# Chi-Square Test between Smoking and Stage
+chisq.test(table(ThyroidCancerData$Smoking, ThyroidCancerData$Stage))
+
+chisq.test(table(ThyroidCancerData$Gender, ThyroidCancerData$Recurred))
+
+# ANOVA test for Age across different Stages
+anova_result <- aov(Age ~ Stage, data = ThyroidCancerData)
+summary(anova_result)
+```
+
+## Plots
+```{r Plots}
+# Load libraries
+library(ggplot2)
+
+# Histogram of Age
+ggplot(ThyroidCancerData, aes(x = Age)) +
+  geom_histogram(binwidth = 5, fill = "skyblue", color = "black") +
+  labs(title = "Distribution of Age", x = "Age", y = "Count")
+
+# Bar plot for Gender
+ggplot(ThyroidCancerData, aes(x = Gender)) +
+  geom_bar(fill = "lightgreen") +
+  labs(title = "Gender Distribution", x = "Gender", y = "Count")
+
+# Bar plot for Stage
+ggplot(ThyroidCancerData, aes(x = Stage)) +
+  geom_bar(fill = "salmon") +
+  labs(title = "Cancer Stage Distribution", x = "Stage", y = "Count")
+
+# Boxplot of Age across Stage
+ggplot(ThyroidCancerData, aes(x = Stage, y = Age, fill = Stage)) +
+  geom_boxplot() +
+  labs(title = "Age Distribution across Cancer Stages", x = "Stage", y = "Age") +
+  theme(legend.position = "none")
+```
+
+# Preprocessing & Data Transformation
+## Missing Values
+```{r Missing values}
+# Check if there are any missing values
+any(is.na(ThyroidCancerData))
+
+# Summary of missing values per column
+colSums(is.na(ThyroidCancerData))
+
+# Visualize missing values (optional)
+# Install if needed: install.packages("Amelia")
+library(Amelia)
+missmap(ThyroidCancerData, main = "Missing Values Map", col = c("red", "green"), legend = FALSE)
+
+```
+
+# Training Model
+## Data Splitting
+```{r Data Splitting}
+# Load required package
+library(caret)
+
+# Set random seed for reproducibility
+set.seed(123)
+
+# Split data: 80% training, 20% testing
+trainIndex <- createDataPartition(ThyroidCancerData$Stage, p = 0.8, list = FALSE)
+
+trainData <- ThyroidCancerData[trainIndex, ]
+testData <- ThyroidCancerData[-trainIndex, ]
+
+# Check dimensions
+dim(trainData)
+dim(testData)
+```
+
