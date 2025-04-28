@@ -35,4 +35,11 @@ testData <- ThyroidCancerData[-trainIndex, ]
 dim(trainData)
 dim(testData)
 
+# Set up bootstrapping
+set.seed(123)
+bootstrap_ctrl <- trainControl(method = "boot", number = 100) # 100 bootstrap resamples
 
+# Example: (We will reuse this when training models)
+model_boot <- train(Stage ~ ., data = trainData, method = "rf", trControl = bootstrap_ctrl)
+
+print(model_boot)
