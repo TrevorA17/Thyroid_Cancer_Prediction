@@ -34,3 +34,5 @@ testData <- ThyroidCancerData[-trainIndex, ]
 # Check dimensions
 dim(trainData)
 dim(testData)
+
+
