@@ -43,3 +43,12 @@ bootstrap_ctrl <- trainControl(method = "boot", number = 100) # 100 bootstrap re
 model_boot <- train(Stage ~ ., data = trainData, method = "rf", trControl = bootstrap_ctrl)
 
 print(model_boot)
+
+# Set up 10-fold cross-validation
+set.seed(123)
+cv_ctrl <- trainControl(method = "cv", number = 10)  # 10-fold CV
+
+# Example: (we will reuse this for models)
+model_cv <- train(Stage ~ ., data = trainData, method = "rf", trControl = cv_ctrl)
+
+print(model_cv)
